@@ -234,6 +234,7 @@ function updateSize() {
 }
 
 async function pasteFromClipboard() {
+  var btn = document.querySelector('.btn-paste');
   try {
     if(!navigator.clipboard || !navigator.clipboard.readText) {
       alert('⚠️ Trình duyệt không hỗ trợ. Vui lòng giữ ô textarea và Paste tay.');
@@ -247,18 +248,19 @@ async function pasteFromClipboard() {
     document.getElementById('html-code').value = text;
     updateSize();
     // Phản hồi nhẹ
-    var btn = event.target;
-    var oldText = btn.textContent;
-    btn.textContent = '✅ Đã dán ' + (new Blob([text]).size/1024).toFixed(1) + ' KB';
-    btn.style.background = '#0d2a1a';
-    btn.style.color = '#44ff88';
-    btn.style.borderColor = '#44ff8833';
-    setTimeout(function(){
-      btn.textContent = oldText;
-      btn.style.background = '';
-      btn.style.color = '';
-      btn.style.borderColor = '';
-    }, 1800);
+    if(btn){
+      var oldText = btn.textContent;
+      btn.textContent = '✅ Đã dán ' + (new Blob([text]).size/1024).toFixed(1) + ' KB';
+      btn.style.background = '#0d2a1a';
+      btn.style.color = '#44ff88';
+      btn.style.borderColor = '#44ff8833';
+      setTimeout(function(){
+        btn.textContent = oldText;
+        btn.style.background = '';
+        btn.style.color = '';
+        btn.style.borderColor = '';
+      }, 1800);
+    }
   } catch(e) {
     alert('❌ Không đọc được clipboard: ' + e.message + '\n\n💡 Trên iOS: Cần dùng HTTPS và cho phép quyền clipboard.');
   }
