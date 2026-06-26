@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta property="og:title" content="Vochi – Con pet học tiếng Anh sống ở góc màn hình">
+<meta property="og:description" content="Build desktop app gần như hoàn toàn bằng Claude Code – từ logic game tới backend Rust.">
+<title>Vochi – Desktop Pet học từ vựng | Built with Claude Code</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f0f14;
+    --card: #17171f;
+    --border: #ffffff12;
+    --text: #e8e8f0;
+    --muted: #8888aa;
+    --accent: #f97316;
+    --blue: #3b82f6;
+    --green: #22c55e;
+    --purple: #a855f7;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.65;
+  }
+
+  /* Hero */
+  .hero {
+    background: linear-gradient(145deg, #1a0f2e 0%, #0f1a2e 50%, #1a1208 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 56px 20px 48px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 60% 40% at 50% 80%, #f9731608 0%, transparent 70%);
+  }
+  .app-badge {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: #ffffff08; border: 1px solid var(--border);
+    border-radius: 100px; padding: 8px 18px 8px 12px;
+    font-size: 13px; color: var(--muted); margin-bottom: 28px;
+  }
+  .app-badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100% { opacity:1 } 50% { opacity:.4 } }
+  .hero h1 {
+    font-size: clamp(32px, 6vw, 52px); font-weight: 900; letter-spacing: -1.5px;
+    background: linear-gradient(135deg, #fff 0%, #f97316 60%, #fbbf24 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    margin-bottom: 16px; line-height: 1.1;
+  }
+  .hero .subtitle {
+    font-size: 17px; color: var(--muted); max-width: 520px; margin: 0 auto 32px;
+  }
+  .hero-tags { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+  .tag {
+    background: #ffffff08; border: 1px solid var(--border);
+    border-radius: 100px; padding: 5px 14px; font-size: 12px; font-weight: 600; color: var(--muted);
+  }
+  .tag.orange { border-color: #f9731630; color: var(--accent); background: #f9731608; }
+  .tag.blue { border-color: #3b82f630; color: var(--blue); background: #3b82f608; }
+  .tag.purple { border-color: #a855f730; color: var(--purple); background: #a855f708; }
+
+  /* Layout */
+  .container { max-width: 720px; margin: 0 auto; padding: 40px 20px 80px; }
+
+  /* Post content */
+  .post-lead {
+    font-size: 18px; color: #c8c8d8; line-height: 1.75;
+    padding: 28px; background: var(--card); border-radius: 16px;
+    border: 1px solid var(--border); margin-bottom: 32px;
+  }
+  .post-lead strong { color: var(--text); }
+
+  /* Section headings */
+  .section-label {
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;
+    color: var(--accent); margin-bottom: 16px;
+  }
+
+  /* Insight cards */
+  .insights { display: flex; flex-direction: column; gap: 16px; margin-bottom: 32px; }
+  .insight-card {
+    display: flex; gap: 16px; align-items: flex-start;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 20px; transition: border-color .2s;
+  }
+  .insight-card:hover { border-color: #ffffff20; }
+  .insight-num {
+    width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 900;
+  }
+  .insight-num.orange { background: #f9731615; color: var(--accent); border: 1px solid #f9731625; }
+  .insight-num.blue { background: #3b82f615; color: var(--blue); border: 1px solid #3b82f625; }
+  .insight-num.green { background: #22c55e15; color: var(--green); border: 1px solid #22c55e25; }
+  .insight-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+  .insight-card p { font-size: 14px; color: var(--muted); line-height: 1.6; }
+  .insight-card p strong { color: #ccc; }
+
+  /* Stack chips */
+  .stack-section { margin-bottom: 32px; }
+  .stack-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+  .stack-chip {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 16px;
+    font-size: 13px; font-weight: 600;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .stack-chip .icon { font-size: 16px; }
+
+  /* CTA */
+  .cta-box {
+    background: linear-gradient(135deg, #1a0f2e, #1a1208);
+    border: 1px solid #f9731625; border-radius: 20px;
+    padding: 36px 28px; text-align: center; margin-bottom: 32px;
+  }
+  .cta-box h2 { font-size: 22px; font-weight: 800; margin-bottom: 10px; }
+  .cta-box p { color: var(--muted); font-size: 14px; margin-bottom: 24px; max-width: 360px; margin-left: auto; margin-right: auto; }
+  .cta-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn-primary {
+    padding: 13px 28px; border-radius: 12px; font-size: 15px; font-weight: 700;
+    background: linear-gradient(135deg, #f97316, #fb923c);
+    color: #fff; border: none; cursor: pointer; text-decoration: none;
+    display: inline-block; transition: opacity .15s;
+  }
+  .btn-primary:hover { opacity: .9; }
+  .btn-ghost {
+    padding: 13px 28px; border-radius: 12px; font-size: 15px; font-weight: 700;
+    background: transparent; color: var(--muted);
+    border: 1px solid var(--border); cursor: pointer; text-decoration: none;
+    display: inline-block; transition: all .15s;
+  }
+  .btn-ghost:hover { border-color: #ffffff30; color: var(--text); }
+
+  /* Author */
+  .author-box {
+    display: flex; align-items: center; gap: 14px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 18px 20px;
+  }
+  .author-avatar {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: linear-gradient(135deg, #f97316, #a855f7);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .author-name { font-size: 15px; font-weight: 700; }
+  .author-bio { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+  /* Divider */
+  .divider { height: 1px; background: var(--border); margin: 32px 0; }
+
+  @media (max-width: 480px) {
+    .hero { padding: 40px 16px 36px; }
+    .container { padding: 28px 16px 60px; }
+    .post-lead { font-size: 16px; padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="app-badge">
+    <span class="dot"></span>
+    Built with Claude Code · Tauri v2 + Rust
+  </div>
+  <h1>Vochi</h1>
+  <p class="subtitle">Con pet kiểu Tamagotchi sống ở góc màn hình — đói dần theo thời gian thực, muốn cho nó ăn thì bạn trả lời một thẻ từ vựng tiếng Anh.</p>
+  <div class="hero-tags">
+    <span class="tag orange">Desktop App</span>
+    <span class="tag blue">Tauri v2</span>
+    <span class="tag purple">FSRS</span>
+    <span class="tag orange">React</span>
+    <span class="tag blue">Rust + SQLite</span>
+    <span class="tag purple">Claude Code</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="post-lead">
+    Mình vừa build xong một app desktop <strong>gần như hoàn toàn bằng Claude Code</strong>, từ logic game tới backend Rust. Chia sẻ thành phẩm và cách mình để agent cày phần lớn việc.
+  </div>
+
+  <div class="section-label">Stack kỹ thuật</div>
+  <div class="stack-section">
+    <div class="stack-grid">
+      <div class="stack-chip"><span class="icon">⚡</span> Tauri v2</div>
+      <div class="stack-chip"><span class="icon">⚛️</span> React</div>
+      <div class="stack-chip"><span class="icon">🦀</span> Rust</div>
+      <div class="stack-chip"><span class="icon">🗄️</span> SQLite (sqlx)</div>
+      <div class="stack-chip"><span class="icon">🧠</span> FSRS algorithm</div>
+      <div class="stack-chip"><span class="icon">🤖</span> Claude Code</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section-label">3 thứ mình rút ra khi để Claude làm phần lớn</div>
+  <div class="insights">
+    <div class="insight-card">
+      <div class="insight-num orange">1</div>
+      <div>
+        <h3>CLAUDE.md thay đổi tất cả</h3>
+        <p>Mình viết một file <strong>CLAUDE.md khá kỹ</strong> mô tả kiến trúc, quy ước IPC, mấy luật không được phạm. Từ lúc có file này, agent gần như không còn tự dẫm chân ở những lần sửa sau — đây là thứ thay đổi nhiều nhất so với lúc đầu vibe code chay.</p>
+      </div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-num blue">2</div>
+      <div>
+        <h3>Frontend ngọt, native thì phải dẫn</h3>
+        <p>Claude xử lý <strong>frontend và logic game rất ngọt</strong>, nhưng tới khúc native AppKit trên macOS (overlay trong suốt always-on-top sống sót khi app khác fullscreen, nhận phím khi cửa sổ không focus) thì phải đọc tài liệu cùng nó và chỉ hướng — để tự thì hay đoán mò.</p>
+      </div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-num green">3</div>
+      <div>
+        <h3>Verify bằng output thật, không tin lời</h3>
+        <p>Mình bắt nó <strong>chạy test và đọc output thật</strong> trước khi tin là xong, thay vì tin lời "đã fix". Cái này cắt được kha khá bug ảo.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="cta-box">
+    <h2>🐦 Thử Vochi miễn phí</h2>
+    <p>Đang beta nên còn thô. Ai dùng sớm thì mình tặng luôn bản <strong>Pro</strong> — đổi lại xin ít feedback thật.</p>
+    <div class="cta-buttons">
+      <a class="btn-primary" href="https://vochi.xyz" target="_blank" rel="noopener">⬇️ Tải về · macOS &amp; Windows</a>
+      <a class="btn-ghost" href="https://vochi.xyz" target="_blank" rel="noopener">vochi.xyz</a>
+    </div>
+  </div>
+
+  <div class="section-label">Tác giả</div>
+  <div class="author-box">
+    <div class="author-avatar">🚀</div>
+    <div>
+      <div class="author-name">Builder dùng Claude Code</div>
+      <div class="author-bio">Ai đang xài Claude Code build sản phẩm thì vào trao đổi workflow nhé.</div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
